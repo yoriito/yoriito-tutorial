@@ -1,0 +1,11 @@
+### Global CODEOWNERS
+
+* @yoriito/tech-organizer @yoriito/tutorial-development-team
+
+### Reviewers for specific directories or files.
+
+/ref_ui @yoriito/tutorial-development-team
+/ref_app @yoriito/tutorial-development-team
+/ref_proto @yoriito/tutorial-development-team
+/ref_pal @yoriito/tutorial-development-team
+/pocket-pal @yoriito/tutorial-development-team

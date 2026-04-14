@@ -1,0 +1,6 @@
+build/
+*/*.bk
+.devcontainer/docker-compose.auto.yml
+ref_pal/config/*.csv
+pocket-pal/**/build
+pocket-pal/**/target

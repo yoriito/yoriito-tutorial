@@ -1,0 +1,16 @@
+#!/bin/bash
+set -e
+
+APP_PATH="/opt/UnityElectronApp"
+CHROME_SANDBOX="$APP_PATH/chrome-sandbox"
+
+if [ -f "$CHROME_SANDBOX" ]; then
+  echo "[postinst] Fixing chrome-sandbox permissions"
+  chown root "$CHROME_SANDBOX"
+  chmod 4755 "$CHROME_SANDBOX"
+else
+  echo "[postinst] chrome-sandbox not found at $CHROME_SANDBOX"
+fi
+
+exit 0
+
