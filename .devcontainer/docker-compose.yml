@@ -1,0 +1,26 @@
+# No privilege restrictions (cap_drop, no-new-privileges, read_only, etc.) are applied 
+# as this is an open development environment.
+services:
+  dev:
+    image: ${YORIITO_DEVCONTAINER}:${YORIITO_VERSION}
+    command: sleep infinity
+    pull_policy: always
+    volumes:
+      - ${ROOT_DIR}:/work
+    # NOTE:
+    # "network_mode: host" is necessary to use vcan0 device created at host.
+    # This image doesn't contain vcan.ko, so we need to use the vcan0 device created on the host,
+    # and additionally this enables use of Kura TUI on the host OS.
+    #
+    # IMPORTANT:
+    # - Using "network_mode: host" removes Docker's network namespace isolation for this container.
+    # - Port mappings (e.g. "ports:") are not supported/ignored when host networking is used.
+    # - Host networking is only fully supported on native Linux Docker hosts; it may not work,
+    #   or may behave differently, on Docker Desktop for macOS/Windows.
+    # In practice, this devcontainer configuration is intended for Linux hosts where vcan0 is
+    # created on the host OS and shared with the container.
+    # (Note) Enabling "network_mode: host" disables network namespace isolation for this container,
+    #        which means port mapping cannot be used. In addition, Docker Desktop (macOS / Windows)
+    #        does not support or has limitations on host networking, so this devcontainer is intended
+    #        to be used on a Linux host.
+    network_mode: host

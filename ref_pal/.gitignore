@@ -1,0 +1,31 @@
+# Electron/Node.js for development .gitignore
+
+# Node.js dependencies
+node_modules/
+
+# Electron build output
+/dist/
+
+# OS/Editor files
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+
+# Electron packager output
+*.asar
+*.deb
+*.rpm
+*.exe
+*.msi
+*.dmg
+*.app
+*.snap
+
+# Environment files/secrets
+.env
+.env.*
+
+# Others
+npm-debug.log*
+yarn-error.log*
