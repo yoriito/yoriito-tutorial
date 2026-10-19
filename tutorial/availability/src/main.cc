@@ -24,21 +24,28 @@ constexpr int kExitNg = 1;
 
 int main() {
   YORIITO_LOG_INITIALIZE("availability");
-  yoriito::Result<bool> result = yoriito::vehicle::body::lights::fog::front::
-      ison_availability_sensor::Get();
+  auto result = yoriito::vehicle::body::lights::fog::front::ison::Get();
 
   if (result.IsErr()) {
     auto err = result.TakeErr();
-    YORIITO_LOG_INFO("availability",
-                    std::string("Get failed: ") + err->Message() +
-                        " (code=" + std::to_string(err->ErrorCode()) + ")");
+    YORIITO_LOG_ERROR("availability",
+                      std::string("Get failed: ") + err->Message() +
+                          " (code=" + std::to_string(err->ErrorCode()) + ")");
+    YORIITO_LOG_FINALIZE();
     return kExitNg;
   }
 
-  auto value = result.TakeOk().value();
+  auto data_point = result.TakeOk().value();
+  const bool is_available_sensor = data_point.IsAvailableSensor();
+  const bool is_available_actuator = data_point.IsAvailableActuator();
 
   YORIITO_LOG_INFO("availability",
-                  std::string("Get succeed: ") + (value ? "true" : "false"));
+                   std::string("Available Sensor: ") +
+                       (is_available_sensor ? "true" : "false"));
+  YORIITO_LOG_INFO("availability",
+                   std::string("Available Actuator: ") +
+                       (is_available_actuator ? "true" : "false"));
 
+  YORIITO_LOG_FINALIZE();
   return kExitOk;
 }

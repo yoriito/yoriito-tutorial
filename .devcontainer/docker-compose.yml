@@ -1,10 +1,20 @@
-# No privilege restrictions (cap_drop, no-new-privileges, read_only, etc.) are applied 
+# No privilege restrictions (cap_drop, no-new-privileges, read_only, etc.) are applied
 # as this is an open development environment.
 services:
   dev:
-    image: ${YORIITO_DEVCONTAINER}:${YORIITO_VERSION}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      pull: true
+      args:
+        YORIITO_DEVCONTAINER: ${YORIITO_DEVCONTAINER}
+        YORIITO_VERSION: ${YORIITO_VERSION}
     command: sleep infinity
-    pull_policy: always
+    tty: true
+    environment:
+      DLT_LOCAL_PRINT_MODE: "FORCE_ON"
+      DBUS_SESSION_BUS_ADDRESS: "unix:path=/run/dbus/session_bus_socket"
+      XDG_RUNTIME_DIR: "/run/user/0"
     volumes:
       - ${ROOT_DIR}:/work
     # NOTE:

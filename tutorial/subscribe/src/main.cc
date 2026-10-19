@@ -20,43 +20,55 @@
 namespace {
 constexpr int kExitOk = 0;
 constexpr int kExitNg = 1;
+
+namespace high_beam = yoriito::vehicle::body::lights::beam::high::ison;
 } // namespace
 
 int main() {
   YORIITO_LOG_INITIALIZE("subscribe");
-  auto sub_result =
-      yoriito::vehicle::body::lights::beam::high::ison::Subscribe();
 
-  if (sub_result.IsErr()) {
-    auto err = sub_result.TakeErr();
-    YORIITO_LOG_INFO("subscribe",
-                    std::string("Subscribe failed: ") + err->Message() +
-                        " (code=" + std::to_string(err->ErrorCode()) + ")");
+  auto subscribe_result = high_beam::Subscribe();
+  if (subscribe_result.IsErr()) {
+    auto error = subscribe_result.TakeErr();
+    YORIITO_LOG_ERROR("subscribe",
+                      std::string("Subscribe failed: ") + error->Message() +
+                          " (code=" + std::to_string(error->ErrorCode()) + ")");
+    YORIITO_LOG_FINALIZE();
     return kExitNg;
   }
 
-  auto subscription_context = sub_result.TakeOk().value();
-  YORIITO_LOG_INFO("subscribe", "Subscribe succeeded. Waiting for updates...");
+  auto subscription_context = subscribe_result.TakeOk().value();
+  YORIITO_LOG_INFO("subscribe", "Waiting for one update...");
 
-  while (true) {
-    auto msg_result = subscription_context->Messages();
-    if (msg_result.IsErr()) {
-      auto err = msg_result.TakeErr();
-      YORIITO_LOG_INFO("subscribe",
-                      std::string("Messages() failed: ") + err->Message() +
-                          " (code=" + std::to_string(err->ErrorCode()) + ")");
-      break;
-    }
+  int exit_code = kExitOk;
 
-    auto response = msg_result.TakeOk().value();
-    const auto &data_points = response.GetDataPoints();
-    const auto &data_point = data_points.front();
-    auto data = data_point.GetData();
-    const bool is_on = std::get<bool>(data);
+  auto message_result = subscription_context.Messages();
+  if (message_result.IsErr()) {
+    auto error = message_result.TakeErr();
+    YORIITO_LOG_ERROR("subscribe",
+                      std::string("Messages() failed: ") + error->Message() +
+                          " (code=" + std::to_string(error->ErrorCode()) + ")");
+    exit_code = kExitNg;
+  } else {
+    auto data_point = message_result.TakeOk().value();
+    const bool is_on = data_point.GetData();
 
-    YORIITO_LOG_INFO("subscribe",
-                    std::string("IsOn updated: ") + (is_on ? "true" : "false"));
+    YORIITO_LOG_INFO("subscribe", std::string("IsOn updated: ") +
+                                      (is_on ? "true" : "false"));
   }
 
-  return kExitOk;
+  auto unsubscribe_result =
+      high_beam::UnSubscribe(std::move(subscription_context));
+  if (unsubscribe_result.IsErr()) {
+    auto error = unsubscribe_result.TakeErr();
+    YORIITO_LOG_ERROR("subscribe",
+                      std::string("UnSubscribe failed: ") + error->Message() +
+                          " (code=" + std::to_string(error->ErrorCode()) + ")");
+    exit_code = kExitNg;
+  } else {
+    YORIITO_LOG_INFO("subscribe", "UnSubscribe succeeded.");
+  }
+
+  YORIITO_LOG_FINALIZE();
+  return exit_code;
 }

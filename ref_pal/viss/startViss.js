@@ -9,6 +9,7 @@ const { propertyMap } = require('../config/vssToUnityMap');
 const { subscribeTarget } = require('./subscriptions');
 const { DEFAULT_VISS_SERVER_ADDRESS, DEFAULT_CSV_FILE_PATH } = require('../config/constants');
 const { readVssSignalSettingsCsv } = require('./vssNodeSetup/readVssSignalSettingsCsv');
+const { getSetCurrentResponseError } = require('./vssNodeSetup/vissGrpcHelpers');
 
 function connectVissServer({ serverAddress }) {
   const baseDir = path.join(__dirname, '..');
@@ -75,9 +76,10 @@ function setCurrentSingleUsingTemplate(client, pathStr, templateDp, valueObj, av
     },
   };
 
-  client.SetCurrent(setRequest, function (err) {
-    if (err) {
-      console.error('[setCurrentSingle] SetCurrent error:', err, 'path=', pathStr);
+  client.SetCurrent(setRequest, function (err, response) {
+    const setError = err || getSetCurrentResponseError(response);
+    if (setError) {
+      console.error('[setCurrentSingle] SetCurrent error:', setError, 'path=', pathStr);
       return;
     }
     console.log('[setCurrentSingle] SetCurrent OK for path', pathStr);
@@ -114,9 +116,10 @@ function setCurrent(client, dataPackage, availabilityMapByPath) {
     },
   };
 
-  client.SetCurrent(setRequest, function (err) {
-    if (err) {
-      console.error('[setCurrent] SetCurrent error:', err);
+  client.SetCurrent(setRequest, function (err, response) {
+    const setError = err || getSetCurrentResponseError(response);
+    if (setError) {
+      console.error('[setCurrent] SetCurrent error:', setError);
       return;
     }
     console.log('[setCurrent] SetCurrent OK for path', dataPackage.path);
