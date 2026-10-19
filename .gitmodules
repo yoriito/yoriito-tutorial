@@ -4,9 +4,3 @@
 [submodule "external/yoriito-viss"]
 	path = external/yoriito-viss
 	url = https://github.com/yoriito/yoriito-viss.git
-[submodule "external/yoriito-vss"]
-	path = external/yoriito-vss
-	url = https://github.com/yoriito/yoriito-vss.git
-[submodule "pocket-pal/external/yoriito-viss"]
-	path = pocket-pal/external/yoriito-viss
-	url = https://github.com/yoriito/yoriito-viss.git

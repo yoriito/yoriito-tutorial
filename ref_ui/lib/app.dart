@@ -28,7 +28,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'yoriito Emergency Application',
-
       builder: (context, child) {
         final screen = MediaQuery.of(context).size;
         final scale = screen.height / kUiReferenceSize.height;
@@ -48,7 +47,6 @@ class MyApp extends StatelessWidget {
           ),
         );
       },
-
       theme: ThemeData(useMaterial3: true),
       home: const SplashPage(),
     );

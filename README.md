@@ -2,7 +2,8 @@
 
 ![GIF](docs/assets/yoriito-tutorial.gif)
 
-Reference implementation repository for the yoriito API Working Group.
+Reference implementation repository for the yoriito API Working Group.  
+This Tutorial Application uses [widget-3d-car-unity](https://github.com/eclipse-autowrx/widget-3d-car-unity).
 
 ## Components
 
@@ -25,15 +26,41 @@ Run the components in the following order:
 
 ## How to Run
 
-### Run on WSL
 
-All components run on WSL.
+### Run on WSL
+***All components run in WSL.***
+
+Open an Ubuntu terminal.
+
+Clone the sample application repository.
+```bash
+git clone https://github.com/yoriito/yoriito-tutorial.git
+```
+
+Fetch submodules.
+```bash
+cd yoriito-tutorial
+git submodule update --init --recursive
+```
+
+Start VS Code
+```bash
+code .
+```
+
+After VS Code starts, Open the Command Palette with Ctrl + Shift + P.
+
+Type and select on the Command Palette "Dev Containers: Rebuild and Reopen in Container".
+
+The container will be built and various libraries will be installed.
+
+***From the next chapter, please run inside the container.***
 
 #### 1) Run the PAL
 
 ```bash
-cd /work/yoriito-tutorial/ref_pal
-npm install
+cd /work/ref_pal
+npm ci
 ./init_pal.sh
 npx electron . --no-sandbox
 ```
@@ -43,7 +70,7 @@ npx electron . --no-sandbox
 #### 2) Run the HeadlessApp
 
 ```bash
-cd /work/yoriito-tutorial/ref_app
+cd /work/ref_app
 cmake -S . -B build
 cmake --build build -j
 ./build/ref_app
@@ -54,7 +81,7 @@ cmake --build build -j
 #### 3) Run the UI
 
 ```bash
-cd /work/yoriito-tutorial/ref_ui
+cd /work/ref_ui
 flutter clean
 flutter pub get
 flutter run -d linux
@@ -68,8 +95,8 @@ flutter run -d linux
 #### 1) Run the PAL on the PC
 
 ```bash
-cd /work/yoriito-tutorial/ref_pal
-npm install
+cd /work/ref_pal
+npm ci
 ./init_pal.sh
 npx electron . --no-sandbox
 ```

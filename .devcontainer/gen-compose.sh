@@ -34,6 +34,8 @@ generate_for_wsl() {
 services:
   dev:
     environment:
+      GALLIUM_DRIVER: "d3d12"
+      LD_LIBRARY_PATH: "/usr/lib/wsl/lib"
       WAYLAND_DISPLAY: "${WAYLAND_DISPLAY:-wayland-0}"
       XDG_RUNTIME_DIR: "${XDG_RUNTIME_DIR:-/mnt/wslg/runtime-dir}"
       PULSE_SERVER: "${PULSE_SERVER:-/mnt/wslg/PulseServer}"
@@ -95,5 +97,5 @@ case "$MODE" in
     generate_for_linux_x11
     ;;
 esac
-
 echo "[gen-compose] wrote ${AUTO_FILE}"
+

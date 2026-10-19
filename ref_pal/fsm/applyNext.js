@@ -40,7 +40,7 @@ function applyTargetNext(client, target, next, templateDp, sendToUnity, setCurre
     }
     // Integers
     else if (key === "position") {
-      valueObj = { int32: Number(nextVal) };
+      valueObj = { uint8: Number(nextVal) };
     } else {
       // Unexpected key (not used in current targets)
       continue;

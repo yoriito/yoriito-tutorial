@@ -115,12 +115,39 @@ function parseDefaultValueByType(defaultValueType, defaultValueText) {
 }
 
 function buildValueObject(defaultValueType, defaultValueText) {
+  const typeKey = String(defaultValueType || '').trim();
+  if (!typeKey) return null;
+
+  if (typeKey === 'value_object') {
+    return {
+      valueObject: {
+        properties: [],
+      },
+    };
+  }
+
+  if (typeKey === 'value_object_array') {
+    return {
+      valueObjectArray: {
+        values: [],
+      },
+    };
+  }
+
   const parsedValue = parseDefaultValueByType(defaultValueType, defaultValueText);
   if (parsedValue === null) return null;
 
-  const grpcValueFieldKey = snakeToCamelCase(defaultValueType);
+  const grpcValueFieldKey = snakeToCamelCase(typeKey);
   const valueObject = {};
-  valueObject[grpcValueFieldKey] = parsedValue;
+
+  if (typeKey.endsWith('_array')) {
+    valueObject[grpcValueFieldKey] = {
+      values: parsedValue,
+    };
+  } else {
+    valueObject[grpcValueFieldKey] = parsedValue;
+  }
+
   return valueObject;
 }
 

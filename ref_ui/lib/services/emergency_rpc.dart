@@ -33,15 +33,15 @@ class EmergencyRpc {
   static const int _port = 50055;
 
   static ClientChannel _channel() => ClientChannel(
-    _host,
-    port: _port,
-    options: const ChannelOptions(
-      credentials: ChannelCredentials.insecure(),
-      // This option is not strictly required. It is applied to avoid short idle timeouts
-      // commonly seen on devices like Raspberry Pi when gRPC channels become temporarily idle.
-      idleTimeout: Duration.zero,
-    ),
-  );
+        _host,
+        port: _port,
+        options: const ChannelOptions(
+          credentials: ChannelCredentials.insecure(),
+          // This option is not strictly required. It is applied to avoid short idle timeouts
+          // commonly seen on devices like Raspberry Pi when gRPC channels become temporarily idle.
+          idleTimeout: Duration.zero,
+        ),
+      );
 
   static Future<T> _withClient<T>(
     Future<T> Function(EmergencyServiceClient stub) body,

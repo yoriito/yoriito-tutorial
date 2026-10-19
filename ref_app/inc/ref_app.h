@@ -19,6 +19,9 @@
 #ifndef REF_APP_H
 #define REF_APP_H
 
+#include <mutex>
+#include <atomic>
+#include <vector>
 #include <grpcpp/grpcpp.h>
 
 // gRPC generated
@@ -162,6 +165,54 @@ public:
     grpc::Status PollToggleAvailability(
         grpc::ServerContext* context, const emrgency::PollOptions* opt,
         ::grpc::ServerWriter<emrgency::ToggleAvailability>* writer) override;
+};
+
+// ──────────────────────────────────────────────
+// SubscriptionManager: Subscription management
+// ──────────────────────────────────────────────
+
+/**
+ * @ingroup Telemetry
+ * @class SubscriptionManager
+ * @brief Manage availability state.
+ * @deprecated -
+ * @version -
+ */
+class SubscriptionManager {
+public:
+    SubscriptionManager(size_t elementCount)
+        : availability_(elementCount, false),
+          allEnabled_(false)
+    {}
+
+    // Update process called from worker thread.
+    void updateAvailability(size_t index, bool available) {
+        std::lock_guard<std::mutex> lock(mutex_);
+        availability_[index] = available;
+
+        bool newState = checkAllEnabled();
+
+        if (newState != allEnabled_) {
+            allEnabled_ = newState;
+        }
+    }
+
+    // Check process called from the main thread
+    bool getAvailability() const {
+        return allEnabled_.load();
+    }
+
+private:
+    bool checkAllEnabled() {
+        for (auto v : availability_) {
+            if (!v) return false;
+        }
+        return true;
+    }
+
+    mutable std::mutex mutex_;
+    std::vector<bool> availability_;
+    std::atomic<bool> allEnabled_;
 };
 
 #endif  // REF_APP_H

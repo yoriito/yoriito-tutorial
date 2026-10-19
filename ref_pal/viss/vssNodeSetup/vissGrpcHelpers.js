@@ -9,6 +9,18 @@ function sleepMilliseconds(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
+function getSetCurrentResponseError(response) {
+  if (!response || !response.error) {
+    return null;
+  }
+
+  const error = response.error;
+  const description = error.description || 'unknown error';
+  return new Error(
+    `VISS SetCurrent failed: number=${error.number}, reason=${error.reason}, description=${description}`
+  );
+}
+
 function setCurrentAsync(vissClient, setCurrentRequest) {
   return new Promise((resolve, reject) => {
     vissClient.SetCurrent(setCurrentRequest, (error, response) => {
@@ -16,6 +28,13 @@ function setCurrentAsync(vissClient, setCurrentRequest) {
         reject(error);
         return;
       }
+
+      const responseError = getSetCurrentResponseError(response);
+      if (responseError) {
+        reject(responseError);
+        return;
+      }
+
       resolve(response);
     });
   });
@@ -69,6 +88,7 @@ function buildSetCurrentRequestMulti(entries) {
 }
 
 module.exports = {
+  getSetCurrentResponseError,
   nowEpochSeconds,
   sleepMilliseconds,
   setCurrentAsync,
