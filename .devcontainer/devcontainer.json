@@ -1,31 +1,66 @@
 {
-  "name": "devcontainer",
+  "name": "yoriito dev container",
   "dockerComposeFile": [
     "./docker-compose.yml",
     "./docker-compose.auto.yml"
   ],
   "service": "dev",
   "workspaceFolder": "/work",
-  "initializeCommand": ".devcontainer/gen-compose.sh",
-  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  "initializeCommand": "bash .devcontainer/gen-compose.sh",
+  "updateContentCommand": "cd /work/ref_ui && flutter pub get",
+  "waitFor": "updateContentCommand",
+  "postStartCommand": "bash .devcontainer/post-start.sh",
   "customizations": {
     "vscode": {
       "extensions": [
         "ms-vscode.cpptools",
+        "llvm-vs-code-extensions.vscode-clangd",
         "xaver.clang-format",
-        "llvm-vs-code-extensions.vscode-clangd"
-      ]
-    },
-    "settings": {
-      "editor.formatOnSave": true,
-      "[cpp]": {
-        "editor.defaultFormatter": "xaver.clang-format"
-      },
-      "C_Cpp.codeAnalysis.clangTidy.enabled": true,
-      "C_Cpp.codeAnalysis.clangTidy.path": "/usr/bin/clang-tidy",
-      "C_Cpp.codeAnalysis.clangTidy.config": "",
-      "C_Cpp.codeAnalysis.runAutomatically": true,
-      "C_Cpp.codeAnalysis.clangTidy.useBuildPath": true
+        "ms-vscode.cmake-tools",
+        "Dart-Code.flutter",
+        "DrBlury.protobuf-vsc",
+        "ms-python.python",
+        "ms-python.black-formatter",
+        "redhat.vscode-yaml",
+        "cheshirekow.cmake-format",
+        "OwenRumney.make-ls"
+      ],
+      "settings": {
+        "C_Cpp.intelliSenseEngine": "disabled",
+        "C_Cpp.formatting": "disabled",
+        "clangd.path": "/usr/bin/clangd",
+        "editor.formatOnSave": true,
+        "[cpp]": {
+          "editor.defaultFormatter": "xaver.clang-format"
+        },
+        "[dart]": {
+          "editor.defaultFormatter": "Dart-Code.dart-code"
+        },
+        "[proto]": {
+          "editor.defaultFormatter": "DrBlury.protobuf-vsc"
+        },
+        "[javascript]": {
+          "editor.defaultFormatter": "vscode.typescript-language-features"
+        },
+        "[python]": {
+          "editor.defaultFormatter": "ms-python.black-formatter"
+        },
+        "[yaml]": {
+          "editor.defaultFormatter": "redhat.vscode-yaml"
+        },
+        "[json]": {
+          "editor.defaultFormatter": "vscode.json-language-features"
+        },
+        "[makefile]": {
+          "editor.defaultFormatter": "OwenRumney.make-ls"
+        },
+        "[cmake]": {
+          "editor.defaultFormatter": "cheshirekow.cmake-format"
+        },
+        "cmakeFormat.args": [
+          "--first-comment-is-literal=true"
+        ]
+      }
     }
   }
 }

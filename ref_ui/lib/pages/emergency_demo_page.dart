@@ -16,9 +16,9 @@
 
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../services/emergency_rpc.dart';
-import '../gen/emergency_toggle.pbenum.dart';
 
 class EmergencyDemoPage extends StatefulWidget {
   const EmergencyDemoPage({super.key});
@@ -33,14 +33,19 @@ class _EmergencyDemoPageState extends State<EmergencyDemoPage> {
   bool _isAvailable = false;
 
   // UI image
-  final ImageProvider _toggleOn = const AssetImage('assets/emergency_png/toggle_on.png');
-  final ImageProvider _toggleOff = const AssetImage('assets/emergency_png/toggle_off.png');
+  final ImageProvider _toggleOn =
+      const AssetImage('assets/emergency_png/toggle_on.png');
+  final ImageProvider _toggleOff =
+      const AssetImage('assets/emergency_png/toggle_off.png');
 
   // Toggle size
   final Rect _toggleRect = const Rect.fromLTWH(96, 229, 220, 220);
 
   // Stream
   StreamSubscription? _pollSub;
+
+  // Focus node
+  final FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
@@ -49,14 +54,23 @@ class _EmergencyDemoPageState extends State<EmergencyDemoPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       precacheImage(_toggleOn, context);
       precacheImage(_toggleOff, context);
+      _focusNode.requestFocus();
       _startTelemetry(interval_ms: 100);
     });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    _pollSub?.cancel();
+    super.dispose();
   }
 
   // --- Telemetry start ---
   void _startTelemetry({int interval_ms = 100}) {
     _pollSub?.cancel();
-    _pollSub = EmergencyRpc.pollToggleAvailability(interval_ms: interval_ms).listen(
+    _pollSub =
+        EmergencyRpc.pollToggleAvailability(interval_ms: interval_ms).listen(
       (ret) {
         if (mounted) {
           setState(() => _isAvailable = ret.isAvailable);
@@ -66,7 +80,8 @@ class _EmergencyDemoPageState extends State<EmergencyDemoPage> {
         if (!mounted) return;
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Availability polling error: $e')));
+        ).showSnackBar(
+            SnackBar(content: Text('Availability polling error: $e')));
         setState(() => _isOn = false);
         _pollSub?.cancel();
         _pollSub = null;
@@ -92,34 +107,59 @@ class _EmergencyDemoPageState extends State<EmergencyDemoPage> {
   // --- UI ---
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      // No AppBar
-      body: Stack(
-        children: [
-          // Draw a UI image. (ON/OFF)
-          Image(image: _isOn && _isAvailable ? _toggleOn : _toggleOff), 
+    return RawKeyboardListener(
+        focusNode: _focusNode,
+        onKey: (event) {
+          if (event is RawKeyDownEvent &&
+              !event.repeat &&
+              event.logicalKey == LogicalKeyboardKey.space) {
+            _handleToggle();
+          }
+        },
+        child: Scaffold(
+          // No AppBar
+          body: Stack(
+            children: [
+              // Draws a UI image. (ON/OFF)
+              Image(image: _isOn && _isAvailable ? _toggleOn : _toggleOff),
 
-          // Draw the toggle state.
-          Positioned(
-            left: 0,
-            right: 0,
-            top: 400,
-            child: Center(
-              child: Text(
-                _isAvailable ? (_isOn ? 'ON' : 'OFF') : 'UNAVALABLE',
-                style: const TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
+              // Draws the toggle state.
+              Positioned(
+                left: 0,
+                right: 0,
+                top: 400,
+                child: Center(
+                  child: Text(
+                    _isAvailable ? (_isOn ? 'ON' : 'OFF') : 'UNAVAILABLE',
+                    style: const TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
               ),
-            ),
-          ),
 
-          // Detecting taps on the toggle area.
-          GestureDetector(
-            onTapDown: (details){
-              if(_toggleRect.contains(details.localPosition)) _handleToggle();
-            }
+              // Draws the operation instruction message.
+              Positioned(
+                  left: 0,
+                  right: 0,
+                  top: 500,
+                  child: Center(
+                      child: Text(
+                    _isAvailable ? 'Press Space to toggle.' : '',
+                    style: const TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold),
+                  ))),
+
+              // Detecting taps on the toggle area.
+              GestureDetector(onTapDown: (details) {
+                if (_toggleRect.contains(details.localPosition))
+                  _handleToggle();
+              }),
+            ],
           ),
-        ],
-      ),
-    );
+        ));
   }
 }

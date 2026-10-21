@@ -26,7 +26,8 @@ class SplashPage extends StatefulWidget {
 class _SplashPageState extends State<SplashPage>
     with SingleTickerProviderStateMixin {
   // Parameter
-  static const Duration _kFadeDuration = Duration(milliseconds: 800); // Fade time
+  static const Duration _kFadeDuration =
+      Duration(milliseconds: 800); // Fade time
   static const Duration _kSplashHold = Duration(seconds: 3); // Display time
   static const String _kLogoAsset =
       'assets/splash_png/yoriito_api_logo_small-1536.png';

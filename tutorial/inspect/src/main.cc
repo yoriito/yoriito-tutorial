@@ -25,26 +25,27 @@ constexpr int kExitNg = 1;
 int main() {
   YORIITO_LOG_INITIALIZE("inspect");
 
-  yoriito::Result<yoriito::databroker::ConsumerInspectResponse> result =
-      yoriito::vehicle::body::lights::beam::high::ison::Inspect();
+  auto result = yoriito::vehicle::body::lights::beam::high::ison::Inspect();
 
   if (result.IsErr()) {
     auto err = result.TakeErr();
-    YORIITO_LOG_INFO("inspect",
-                    std::string("Inspect failed: ") + err->Message() +
-                        " (code=" + std::to_string(err->ErrorCode()) + ")");
+    YORIITO_LOG_ERROR("inspect",
+                      std::string("Inspect failed: ") + err->Message() +
+                          " (code=" + std::to_string(err->ErrorCode()) + ")");
+    YORIITO_LOG_FINALIZE();
     return kExitNg;
   }
 
   auto inspect_response = result.TakeOk().value();
+  auto data_points = inspect_response.GetDataPoints();
 
-  if (inspect_response.GetDataPoints().empty()) {
-    YORIITO_LOG_INFO("inspect", "Inspect failed: No data points returned.");
+  if (data_points.empty()) {
+    YORIITO_LOG_ERROR("inspect", "Inspect failed: No data points returned.");
+    YORIITO_LOG_FINALIZE();
     return kExitNg;
   }
 
-  const yoriito::databroker::ConsumerInspectData &inspect_data =
-      inspect_response.GetDataPoints().front();
+  const auto &inspect_data = data_points.front();
 
   const auto &path = inspect_data.GetPath();
   // const auto &data_type = inspect_data.GetDataType();
@@ -61,9 +62,10 @@ int main() {
   // const auto &pattern = inspect_data.GetPattern();
   // const auto &custom_attributes = inspect_data.GetCustomAttributes();
 
-  YORIITO_LOG_INFO("inspect", "Inspect succeed");
+  YORIITO_LOG_INFO("inspect", "Inspect succeeded");
   YORIITO_LOG_INFO("inspect", std::string("Path: ") + path);
   YORIITO_LOG_INFO("inspect", std::string("Description: ") + description);
 
+  YORIITO_LOG_FINALIZE();
   return kExitOk;
 }
