@@ -103,7 +103,23 @@ def map_vss_datatype_to_csv_default_value_type(vss_datatype: str) -> str:
         "float": "float",
         "double": "double",
     }
-    return datatype_map.get(vss_datatype, "string")
+
+    if vss_datatype.startswith("Types."):
+        if vss_datatype.endswith("[]"):
+            return "value_object_array"
+        return "value_object"
+
+    if vss_datatype.endswith("[]"):
+        element_datatype = vss_datatype[:-2]
+        element_value_type = datatype_map.get(element_datatype)
+        if element_value_type is None:
+            raise ValueError(f"Unsupported VSS array datatype: {vss_datatype}")
+        return f"{element_value_type}_array"
+
+    value_type = datatype_map.get(vss_datatype)
+    if value_type is None:
+        raise ValueError(f"Unsupported VSS datatype: {vss_datatype}")
+    return value_type
 
 
 def get_default_value_for_normal_node(csv_value_type: str) -> str:
@@ -115,6 +131,10 @@ def get_default_value_for_normal_node(csv_value_type: str) -> str:
         "float", "double",
     }:
         return "0"
+    if csv_value_type.endswith("_array"):
+        return "[]"
+    if csv_value_type == "value_object":
+        return "{}"
     return ""
 
 

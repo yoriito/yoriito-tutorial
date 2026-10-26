@@ -18,40 +18,51 @@
 
 #pragma once
 
+#include <chrono>
+#include <memory>
+#include <optional>
 #include <string>
+#include <vector>
+
 #include "databroker/databroker_producer.h"
 #include "databroker/databroker_producer_factory.h"
 #include "result.h"
 
 namespace {
-    inline double get_time() {
-        const auto now = std::chrono::system_clock::now();
-        const auto epoch_duration = now.time_since_epoch();
-        std::chrono::duration<double> seconds_since_epoch = epoch_duration;
-        double epoch_time_as_double = seconds_since_epoch.count();
-        return epoch_time_as_double;
-    }
+inline double get_time() {
+  const auto now = std::chrono::system_clock::now();
+  const auto epoch_duration = now.time_since_epoch();
+  std::chrono::duration<double> seconds_since_epoch = epoch_duration;
+  double epoch_time_as_double = seconds_since_epoch.count();
+  return epoch_time_as_double;
 }
+} // namespace
 
 namespace VSSBroker {
 
-    template<typename T>
-    void write(std::string path, T data, bool is_available_sensor, bool is_available_actuator) {
-        yoriito::databroker::DataBrokerProducer* producer = yoriito::databroker::DataBrokerProducerFactory::GetInstance();
-        const std::optional<double> produced_timestamp = get_time();
-        auto data_point = yoriito::databroker::ProducerSetDataPoint { path, data, is_available_sensor, is_available_actuator, produced_timestamp };
-        const std::vector<yoriito::databroker::ProducerSetDataPoint> data_points = { data_point };
-        auto set_request = yoriito::databroker::ProducerSetRequest{ data_points };
-        producer->Set(set_request);
-    }
+template <typename T>
+void write(std::string path, T data, bool is_available_sensor,
+           bool is_available_actuator) {
+  yoriito::databroker::DataBrokerProducer *producer =
+      yoriito::databroker::DataBrokerProducerFactory::GetInstance();
+  const std::optional<double> produced_timestamp = get_time();
+  auto data_point = yoriito::databroker::ProducerSetDataPoint{
+      path, data, is_available_sensor, is_available_actuator,
+      produced_timestamp};
+  const std::vector<yoriito::databroker::ProducerSetDataPoint> data_points = {
+      data_point};
+  auto set_request = yoriito::databroker::ProducerSetRequest{data_points};
+  producer->Set(set_request);
+}
 
-    yoriito::Result<std::unique_ptr<yoriito::databroker::ProducerSubscribeContext>> subscribe(std::string path) {
-        yoriito::databroker::DataBrokerProducer* producer = yoriito::databroker::DataBrokerProducerFactory::GetInstance();
-        auto data = yoriito::databroker::ProducerSubscribeRequest { path };
-        auto ret = producer->Subscribe(data);
-        return ret;
-    }
+yoriito::Result<std::unique_ptr<yoriito::databroker::ProducerSubscribeContext>>
+subscribe(std::string path) {
+  yoriito::databroker::DataBrokerProducer *producer =
+      yoriito::databroker::DataBrokerProducerFactory::GetInstance();
+  auto data = yoriito::databroker::ProducerSubscribeRequest{path};
+  auto ret = producer->Subscribe(data);
+  return ret;
+}
 
-    void unsubscribe(std::string subscription_id) {
-    }
-};
+void unsubscribe(std::string subscription_id) {}
+}; // namespace VSSBroker

@@ -24,9 +24,20 @@ ref_pal/
 ## Setup / Debug Run
 
 ```bash
-$ npm install
+$ npm ci
 $ ./init_pal.sh
 $ npx electron . --no-sandbox
+```
+### Security Notice
+
+When installing dependencies with `npm ci`, dependency packages may be 
+flagged as having known vulnerabilities.
+
+After installation, please run `npm audit` to check for vulnerabilities.
+If any are found, review their impact and update the packages as needed.
+
+```bash
+$ npm audit
 ```
 
 ## Build and Distribution

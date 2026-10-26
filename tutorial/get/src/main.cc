@@ -25,21 +25,23 @@ constexpr int kExitNg = 1;
 int main() {
   YORIITO_LOG_INITIALIZE("get");
 
-  yoriito::Result<bool> result =
-      yoriito::vehicle::body::lights::beam::high::ison::Get();
+  auto result = yoriito::vehicle::body::lights::beam::high::ison::Get();
 
   if (result.IsErr()) {
     auto err = result.TakeErr();
-    YORIITO_LOG_INFO("get", std::string("Get failed: ") + err->Message() +
-                               " (code=" + std::to_string(err->ErrorCode()) +
-                               ")");
+    YORIITO_LOG_ERROR("get", std::string("Get failed: ") + err->Message() +
+                                 " (code=" + std::to_string(err->ErrorCode()) +
+                                 ")");
+    YORIITO_LOG_FINALIZE();
     return kExitNg;
   }
 
-  auto value = result.TakeOk().value();
+  auto data_point = result.TakeOk().value();
+  const bool value = data_point.GetData();
 
   YORIITO_LOG_INFO("get",
-                  std::string("Get succeed: ") + (value ? "true" : "false"));
+                   std::string("Get succeeded: ") + (value ? "true" : "false"));
 
+  YORIITO_LOG_FINALIZE();
   return kExitOk;
 }

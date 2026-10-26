@@ -31,14 +31,16 @@ int main() {
 
   if (set_result.IsErr()) {
     const yoriito::Result<void>::ErrorPtr err = set_result.TakeErr();
-    YORIITO_LOG_INFO("set", std::string("Set failed: ") + err->Message() +
-                               " (code=" + std::to_string(err->ErrorCode()) +
-                               ")");
+    YORIITO_LOG_ERROR("set", std::string("Set failed: ") + err->Message() +
+                                 " (code=" + std::to_string(err->ErrorCode()) +
+                                 ")");
+    YORIITO_LOG_FINALIZE();
     return kExitNg;
   }
 
-  YORIITO_LOG_INFO("set",
-                  std::string("Set succeed: ") + (is_on ? "true" : "false"));
+  YORIITO_LOG_INFO(
+      "set", std::string("Set succeeded: ") + (is_on ? "true" : "false"));
 
+  YORIITO_LOG_FINALIZE();
   return kExitOk;
 }
